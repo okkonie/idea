@@ -1,10 +1,13 @@
-import React, { useState } from "react";
-import { View, Modal, TouchableOpacity, StyleSheet, TextInput, Text, Animated } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View, Modal, TouchableOpacity, StyleSheet, TextInput, Text, Animated, Dimensions, Pressable } from 'react-native';
 import { Ionicons, Entypo } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
 
 export const AddModal = ({ visible, onClose, onPress }) => {
   const [head, setHead] = useState("");
   const [text, setText] = useState("");
+  const [mode, setMode] = useState('notes');
   const slideAnim = React.useRef(new Animated.Value(-600)).current;
   const rotateAnim = React.useRef(new Animated.Value(0)).current;
 
@@ -70,6 +73,17 @@ export const AddModal = ({ visible, onClose, onPress }) => {
             }
           ]}
         >
+          <Pressable style={styles.modeButton} onPress={() => setMode(mode === "notes" ? "calendar" : "notes")}>
+            <View style={[styles.modeOption, {backgroundColor: mode === "notes" ? '#2a785a' : 'white'}]}>
+              <Entypo name="new-message" size={15} color={mode === "notes" ? 'white' : 'black'}/>
+              <Text style={{color: mode === "notes" ? 'white' : 'black', fontFamily: 'Regular', fontSize: 12}}>NOTES</Text>
+            </View>
+            <View style={[styles.modeOption, {backgroundColor: mode === "calendar" ? '#2a785a' : 'white'}]}>
+              <Entypo name="calendar" size={15} color={mode === "calendar" ? 'white' : 'black'}/>
+              <Text style={{color: mode === "calendar" ? 'white' : 'black', fontFamily: 'Regular', fontSize: 12}}>CALENDAR</Text>
+            </View>
+          </Pressable>
+
           <TextInput 
             style={styles.headInput}
             placeholder='head'
@@ -86,6 +100,10 @@ export const AddModal = ({ visible, onClose, onPress }) => {
             numberOfLines={400}
             cursorColor='#2a785a'  
           />
+          <TouchableOpacity style={styles.speechButton}>
+            <Text style={{color: 'black', fontFamily: 'Regular', fontSize: 14}}>VOICE</Text>
+            <Ionicons name="mic-outline" size={22} color="black" />
+          </TouchableOpacity>
           <View style={styles.buttons}>
             <View style={styles.button}>
               <TouchableOpacity>
@@ -97,7 +115,7 @@ export const AddModal = ({ visible, onClose, onPress }) => {
               </TouchableOpacity>
             </View>
             <View style={styles.button}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => {<Camera />}}>
                 <Ionicons  name="camera-outline" size={22} color="black" style={{padding: 13}} />
               </TouchableOpacity>
               <Text style={{color: '#ccc'}}>|</Text>
@@ -110,7 +128,7 @@ export const AddModal = ({ visible, onClose, onPress }) => {
             <Text style={{fontFamily: 'Bold', color: '#fff'}}>Add item</Text>
           </TouchableOpacity>
         </Animated.View>
-        <TouchableOpacity style={styles.modalCloser}  onPress={handleClose} />
+        <TouchableOpacity style={styles.modalCloser} onPress={handleClose} />
     </Modal>
     </>
   );
@@ -118,19 +136,18 @@ export const AddModal = ({ visible, onClose, onPress }) => {
 
 const styles = StyleSheet.create({
   modalCloser: {
-    height: 500,
+    flex: 1,
     backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 0,
   },
   modalContent: {
     backgroundColor: 'white',
     padding: 20,
     borderBottomEndRadius: 25,
     borderBottomStartRadius: 25,
-    width: '100%',
-    height: 490,
+    width: width,
+    height: height * 0.7,
     alignItems: 'center',
     justifyContent: 'space-evenly',
     shadowColor: '#000',
@@ -146,10 +163,33 @@ const styles = StyleSheet.create({
     margin: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 32.5,
+    borderRadius: 22.5,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     position: 'absolute',
-    left: '2%',
-    bottom: '2%',
+    left: width * 0.02,
+    bottom: height * 0.02,
+  },
+  modeButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '100%',
+    height: 30,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    borderRadius: 15,
+    flexDirection: 'row',
+  },
+  modeOption: {
+    borderRadius: 15,
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 10, width: '50%', 
+    justifyContent: 'center', 
+    height: '100%'
   },
   headInput: {
     fontFamily: 'Bold',
@@ -169,6 +209,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 20,
     borderRadius: 25,
+  },
+  speechButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '100%',
+    height: 50,
+    gap: 20,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   buttons: {
     width: '100%',
